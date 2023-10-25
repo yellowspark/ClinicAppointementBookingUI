@@ -1,0 +1,405 @@
+<div class="container-fluid">
+  <div class="header">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
+      <div class="container-fluid">
+        <a class="navbar-brand">Clinic Appointment Booking</a>
+        <a class="navbar-brand">Dashboard</a>
+        <!-- <ul class="nav-item"> -->
+
+        <!-- </ul> -->
+      </div>
+    </nav>
+    <nav
+      class="navbar navbar-expand-lg navbar-light"
+      style="background-color: lightgray"
+    >
+      <div class="container-fluid">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul
+            class="navbar-nav me-auto mb-2 mb-lg-0 d-flex justify-content-around"
+          >
+            <li class="nav-item">
+              <a class="nav-link active" id="home-menu" (click)="handleHome()"
+                >Home</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link c-p"
+                id="add-menu"
+                (click)="handleAddAppointment()"
+                >Add Appointment</a
+              >
+            </li>
+            <!-- <li class="nav-item">
+              <a
+                class="nav-link c-p"
+                id="add-menu"
+                (click)="handleUpdateProfile()"
+                >Update Profile</a
+              >
+            </li> -->
+            <li class="nav-item">
+              <a class="nav-link c-p" id="signOut" (click)="handleSignOut()"
+                >SignOut</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </div>
+  <div class="body p-3">
+    <table mat-table [dataSource]="List" class="mat-elevation-z8">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="createdDate">
+        <th mat-header-cell *matHeaderCellDef>Created Date</th>
+        <td mat-cell *matCellDef="let element">{{ element.createdDate }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="clientName">
+        <th mat-header-cell *matHeaderCellDef>client Name</th>
+        <td mat-cell *matCellDef="let element">{{ element.clientName }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="appointmentDate">
+        <th mat-header-cell *matHeaderCellDef>Appointment Date</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.appointmentDate }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="appointmentTime">
+        <th mat-header-cell *matHeaderCellDef>Appointment Time</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.appointmentTime }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="clinicName">
+        <th mat-header-cell *matHeaderCellDef>Clinic Name</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.clinicName }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="service">
+        <th mat-header-cell *matHeaderCellDef>Service</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.service }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.status }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="setting">
+        <th mat-header-cell *matHeaderCellDef>Setting</th>
+        <td mat-cell *matCellDef="let element">
+          <button
+            *ngIf="element.status !== 'CANCELLED'"
+            mat-raised-button
+            color="primary"
+            class="mx-3"
+            (click)="handleEdit(element)"
+          >
+            Edit
+          </button>
+          <button
+            *ngIf="element.status !== 'CANCELLED'"
+            mat-raised-button
+            color="warn"
+            (click)="handleDelete(element.id)"
+          >
+            Cancel
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal">
+    <div class="modal-dialog modal-dialog-centered" style="width: 700px">
+      <div class="modal-content" style="width: inherit">
+        <div class="modal-body p-5" style="width: inherit">
+          <h2 class="text-center mb-5 _header"></h2>
+          <form (ngSubmit)="handleSubmit(myForm)" #myForm="ngForm">
+            <div class="mb-3 w-100 d-flex">
+              <div class="mb-3 w-50">
+                <label for="patientName" class="form-label"
+                  >Patient Name *</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="patientName"
+                  name="patientName"
+                  ngModel
+                  required
+                />
+                <small
+                  id="patientNameText"
+                  class="form-text text-danger"
+                  style="display: none"
+                >
+                  Field is required
+                </small>
+              </div>
+              <div class="mb-3 ms-3 w-50">
+                <label for="appointmentService" class="form-label"
+                  >Service *</label
+                >
+                <select
+                  id="appointmentService"
+                  class="form-control"
+                  name="appointmentService"
+                  (change)="handleServiceDataList()"
+                  ngModel
+                  required
+                >
+                  <option value="" selected disabled>
+                    Please Select Service
+                  </option>
+                  <option value="VACCINATION">Vaccination</option>
+                  <option value="PEDEATRIC VACCINE">Pedeatric Vaccine</option>
+                  <option value="Lab TEST">Lab test</option>
+                  <option value="FEVER AND ILLNESS">Fever And Illness</option>
+                  <option value="WOUND CARE">Wound Care</option>
+                  <option value="GENERAL VISIT">General Visit</option>
+                  <option value="DIET">Diet</option>
+                  <option value="INJURY">Injury</option>
+                  <option value="TRAUMA">Trauma</option>
+                </select>
+                <div
+                  id="appointmentServiceText"
+                  class="form-text text-danger"
+                  style="display: none"
+                >
+                  Field is required
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 w-100 d-flex">
+              <div class="mb-3 w-50">
+                <label for="appointmentDate" class="form-label"
+                  >Appointment Date *</label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  id="appointmentDate"
+                  name="appointmentDate"
+                  ngModel
+                  required
+                />
+                <small
+                  id="appointmentDateText"
+                  class="form-text text-danger"
+                  style="display: none"
+                >
+                  Field is required
+                </small>
+              </div>
+              <div class="mb-3 ms-3 w-50">
+                <label for="appointmentTime" class="form-label"
+                  >Appointment Time *</label
+                >
+                <input
+                  type="time"
+                  class="form-control"
+                  id="appointmentTime"
+                  name="appointmentTime"
+                  ngModel
+                  required
+                />
+                <small
+                  id="appointmentTimeText"
+                  class="form-text text-danger"
+                  style="display: none"
+                >
+                  Field is required
+                </small>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="clinicName" class="form-label">Clinic Name *</label>
+              <input
+                type="text"
+                class="form-control"
+                id="clinicName"
+                name="clinicName"
+                readonly
+                ngModel
+                required
+              />
+              <small
+                id="clinicNameText"
+                class="form-text text-danger"
+                style="display: none"
+              >
+                Field is required
+              </small>
+            </div>
+            <div class="mb-3">
+              <label for="clinicAddress" class="form-label"
+                >Clinic Address *</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="clinicAddress"
+                name="clinicAddress"
+                required
+                readonly
+                ngModel
+                #claimName="ngModel"
+              />
+              <div
+                id="clinicAddressText"
+                class="form-text text-danger"
+                style="display: none"
+              >
+                Field is required
+              </div>
+            </div>
+
+            <button
+              [disabled]="!IsSaved"
+              type="submit"
+              class="btn btn-primary my-3 w-25 float-end"
+              id="buttonOperation"
+            ></button>
+          </form>
+
+          <div class="mb-3 w-100" style="display: none" id="ServiceBlock">
+            <table
+              mat-table
+              [dataSource]="_ServiceDataList"
+              class="mat-elevation-z8"
+            >
+              <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td
+                  mat-cell
+                  *matCellDef="let element"
+                  [style]="
+                    clinicId === element.id
+                      ? 'color:yellow; fontWeight:500'
+                      : ''
+                  "
+                >
+                  {{ element.id }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="clinicName">
+                <th mat-header-cell *matHeaderCellDef>Clinic Name</th>
+                <td
+                  mat-cell
+                  *matCellDef="let element"
+                  [style]="
+                    clinicName === element.clinicName ? 'color:yellow' : ''
+                  "
+                >
+                  {{ element.clinicName }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="clinicAddress">
+                <th mat-header-cell *matHeaderCellDef>Clinic Address</th>
+                <td
+                  mat-cell
+                  *matCellDef="let element"
+                  [style]="
+                    clinicAddress === element.clinicAddress
+                      ? 'color:yellow'
+                      : ''
+                  "
+                >
+                  {{ element.clinicAddress }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="service">
+                <th mat-header-cell *matHeaderCellDef>Service</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.service }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="setting">
+                <th mat-header-cell *matHeaderCellDef>Setting</th>
+                <td mat-cell *matCellDef="let element">
+                  <button
+                    *ngIf="element.status !== 'CANCELLED'"
+                    mat-raised-button
+                    color="primary"
+                    class="mx-3"
+                    (click)="handleSelectClinic(element)"
+                  >
+                    Select
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="ServiceDataColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: ServiceDataColumns"
+              ></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Model -->
+
+  <!-- Toast -->
+  <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div
+      id="ToastOperation"
+      class="toast"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+    >
+      <div class="toast-header">
+        <strong class="me-auto toast-title"></strong>
+        <!-- <small>11 mins ago</small> -->
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="toast"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="toast-body text-white"></div>
+    </div>
+  </div>
+  <!-- End Toast -->
+</div>

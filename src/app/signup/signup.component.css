@@ -1,0 +1,28 @@
+.container-fluid {
+  min-height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  /* //background-image: url("../../../assets/clip\ art\ 1.png"); */
+  background-color: blueviolet;
+  opacity: 1;
+  background-size: cover;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.body {
+  min-height: 60%;
+  min-width: 30%;
+  display: inline-block;
+  border: 0.1px solid lightgrey;
+  box-sizing: border-box;
+  opacity: 1;
+}
+
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched {
+  border: 1px solid red;
+}
